@@ -116,13 +116,18 @@ size_t tty_read(struct tty *t, char *buff, size_t size) {
 		size -= count;
 
 		if (!rc) {
+			ipl_t ipl;
 			mutex_unlock(&t->lock);
 
 			/* Here we must check if we must wait or no, because
 			 * tty_rx_locked can be called already. */
-			if (ring_empty(&t->rx_ring)) {
-				rc = sched_wait_timeout(timeout, NULL);
+			ipl = ipl_save();
+			{
+				if (ring_empty(&t->rx_ring)) {
+					rc = sched_wait_timeout(timeout, NULL);
+				}
 			}
+			ipl_restore(ipl);
 
 			mutex_lock(&t->lock);
 
