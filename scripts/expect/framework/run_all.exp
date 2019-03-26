@@ -37,9 +37,7 @@ proc run_all_tests {tests_list_file embox_ip host_ip host_passwd} {
 
 		puts [exec cat $short_log]
 		if { $status != 0 } {
-			# Find the last failed test and print only its output
-			set line_failed_test [exec grep -n "TEST CASE.*running" $logfile | tail -1 | awk {{gsub(":","",$1); print $1}}]
-			puts [exec tail -n +$line_failed_test $logfile]
+			puts [exec cat $logfile]
 			puts "    autotest: FAILED (error code = $status)"
 			set test_res -1
 		} else {
